@@ -10,9 +10,10 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
     libraries={
         "pandas": "1.4.2",
         "pyarrow": "11.0.0",
-        "numpy": "1.21.2",
+        "numpy": "1.26.0",
         "scikit-learn": "1.1.2",
-    }
+    },
+    python="3.10.10"
 )
 class TaxiFarePrediction(FlowSpec):
     data_url = Parameter("data_url", default=URL)
@@ -23,6 +24,14 @@ class TaxiFarePrediction(FlowSpec):
         # Understand what is happening.
         # Revisit task 1 and think about what might go in this function.
 
+        obviously_bad_data_filters = [
+            df.fare_amount > 0,  # fare_amount in US Dollars
+            df.trip_distance <= 100,  # trip_distance in miles
+            df.trip_distance > 0,
+            df.passenger_count >= 1,
+        ]
+        for f in obviously_bad_data_filters:
+            df = df[f]
         return df
 
     @step
